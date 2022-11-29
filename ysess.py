@@ -4,11 +4,11 @@
 import subprocess as sp, os, math, sys, re
 import subprocess
 import time
-from ConfigParser import ConfigParser
-from cStringIO import StringIO
+from configparser import ConfigParser
+from io import StringIO
 from optparse import OptionParser
-
 import dbus
+import sys
 
 DBUS = 'qdbus org.kde.yakuake '
 YAKUAKE_DEFAULT_NEW_SESSIONS_OPENED = 1
@@ -37,13 +37,16 @@ class SortedDict(dict):
         for key in self.keyOrder:
             yield self[key]
     def __setitem__(self, key, val):
-        self.keyOrder.append(key)
-        dict.__setitem__(self, key, val)
+        # self[key] = val
+        self.update({key: val})
+       # self.keyOrder.append(key)
+       #  dict.__setitem__(self, key, val)
     def __delitem__(self, key):
         self.keyOrder.remove(key)
         dict.__delitem__(self, key)
 
-
+# Allows arbitrary many input arguments with keywords in **opts
+# These will be available as a dictionary inside the function
 def get_stdout(cmd, **opts):
     opts.update({'stdout': sp.PIPE})
     if 'env' in opts:
@@ -61,16 +64,17 @@ def get_stdout(cmd, **opts):
 
 
 def get_yakuake(cmd):
+    # The calling functions expect a string and not a byte-like object
     return get_stdout(DBUS + cmd)
 
 
-def get_sessions():
+def get_sessions(encoding):
     tabs = []
-    sessnum = len(get_yakuake('/yakuake/sessions terminalIdList').split(','))
+    sessnum = len(get_yakuake('/yakuake/sessions terminalIdList').decode(encoding).split(','))
     activesess = int(get_yakuake('/yakuake/sessions activeSessionId'))
 
-    sessions = sorted(int(i) for i in get_yakuake('/yakuake/sessions sessionIdList').split(','))
-    ksessions = sorted(int(line.split('/')[-1]) for line in get_yakuake('').split('\n') if '/Sessions/' in line)
+    sessions = sorted(int(i) for i in get_yakuake('/yakuake/sessions sessionIdList').decode(encoding).split(','))
+    ksessions = sorted(int(line.split('/')[-1]) for line in get_yakuake('').decode(encoding).split('\n') if '/Sessions/' in line)
     session_map = dict(zip(sessions, ksessions))
     last_tabid = None
 
@@ -94,21 +98,21 @@ def get_sessions():
             'tabid': tabid,
             'active': sessid == activesess,
             'split': split,
-            'cwd': get_stdout('pwdx '+pid).partition(' ')[2],
+            'cwd': get_stdout('pwdx '+pid.decode(encoding)).decode(encoding).partition(' ')[2],
             'cmd': '' if fgpid == pid else get_stdout('ps '+fgpid, env={'PS_FORMAT': 'command'}).split('\n')[-1],
         })
     return tabs
 
 
-def format_sessions(tabs, fp):
+def format_sessions(tabs, fp, encoding):
     cp = ConfigParser(dict_type=SortedDict)
     tabpad = int(math.log10(len(tabs))) + 1
     for i, tab in enumerate(tabs):
         section = ('Tab %%0%dd' % tabpad) % (i+1)
         cp.add_section(section)
-        cp.set(section, 'title', tab['title'])
-        cp.set(section, 'active', 1 if tab['active'] else 0)
-        cp.set(section, 'tab', tab['tabid'])
+        cp.set(section, 'title', tab['title'].decode(encoding))
+        cp.set(section, 'active', str(1) if tab['active'] else str(0))
+        cp.set(section, 'tab', str(tab['tabid']))
         cp.set(section, 'split', tab['split'])
         cp.set(section, 'cwd', tab['cwd'])
         cp.set(section, 'cmd', tab['cmd'])
@@ -190,7 +194,7 @@ if __name__ == '__main__':
     opts, args = op.parse_args()
 
     if opts.outfile is None and opts.infile is None:
-        format_sessions(get_sessions(), sys.stdout)
+        format_sessions(get_sessions(sys.getdefaultencoding()), sys.stdout, sys.getdefaultencoding())
     elif opts.outfile:
         fp = sys.stdout
         if opts.outfile and opts.outfile != '-' and (
@@ -198,7 +202,7 @@ if __name__ == '__main__':
             or opts.force_overwrite
             or raw_input('Specified file exists, overwrite? [y/N] ').lower().startswith('y')):
             fp = open(opts.outfile, 'w')
-        format_sessions(get_sessions(), fp)
+        format_sessions(get_sessions(sys.getdefaultencoding()), fp, sys.getdefaultencoding())
     elif opts.infile:
         fp = sys.stdin
         if opts.infile and opts.infile != '-':
