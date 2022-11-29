@@ -127,7 +127,7 @@ def clear_sessions():
 
 def load_sessions(file):
     cp = ConfigParser(dict_type=SortedDict)
-    cp.readfp(file)
+    cp.read_file(file)
     sections = cp.sections()
     if not sections:
         print >>sys.stderr, "No tab info found, aborting"
