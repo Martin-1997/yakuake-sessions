@@ -99,15 +99,17 @@ def get_sessions(encoding):
             'active': sessid == activesess,
             'split': split,
             'cwd': get_stdout('pwdx '+pid.decode(encoding)).decode(encoding).partition(' ')[2],
-            'cmd': '' if fgpid == pid else get_stdout('ps '+fgpid, env={'PS_FORMAT': 'command'}).split('\n')[-1],
+            'cmd': '' if fgpid == pid else get_stdout('ps '+fgpid.decode(encoding), env={'PS_FORMAT': 'command'}).decode(encoding).split('\n')[-1],
         })
     return tabs
 
 
 def format_sessions(tabs, fp, encoding):
-    cp = ConfigParser(dict_type=SortedDict)
+    # cp = ConfigParser(dict_type=SortedDict)
+    cp = ConfigParser()
     tabpad = int(math.log10(len(tabs))) + 1
     for i, tab in enumerate(tabs):
+        print(tab)
         section = ('Tab %%0%dd' % tabpad) % (i+1)
         cp.add_section(section)
         cp.set(section, 'title', tab['title'].decode(encoding))
@@ -136,7 +138,9 @@ def load_sessions(file):
     # Clear existing sessions, but only if we have good info (above)
     # clear_sessions()
     subprocess.call(['killall', 'yakuake'])
-    subprocess.call(['yakuake'])
+    # This starts the command and idels until the program (yakuake) is ended - this leads to the problem that the whole calling code is also on hold
+    # subprocess.call(['yakuake'])
+    subprocess.Popen(['yakuake'])
     time.sleep(2)
     # for section in sections:
     #     get_yakuake('/yakuake/sessions addSession')
@@ -200,7 +204,9 @@ if __name__ == '__main__':
         if opts.outfile and opts.outfile != '-' and (
             not os.path.exists(opts.outfile)
             or opts.force_overwrite
-            or raw_input('Specified file exists, overwrite? [y/N] ').lower().startswith('y')):
+            # This causes problems
+            #or raw_input('Specified file exists, overwrite? [y/N] ').lower().startswith('y')
+            ):
             fp = open(opts.outfile, 'w')
         format_sessions(get_sessions(sys.getdefaultencoding()), fp, sys.getdefaultencoding())
     elif opts.infile:

@@ -90,3 +90,6 @@ ENV/
 
 # Created by .ignore support plugin (hsz.mobi)
 .idea
+
+# Testing file
+test.txt
