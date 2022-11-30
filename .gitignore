@@ -94,5 +94,3 @@ ENV/
 # File which stores the current Yakuake state
 yakuake_state.txt
 
-# Folder for packaging the project as a PIP packages
-packaging/
