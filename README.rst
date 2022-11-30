@@ -1,3 +1,8 @@
+This branch is for experimenting only. I used this tutorial:
+https://packaging.python.org/en/latest/tutorials/packaging-projects/
+
+to create a Python package for the source code
+
 Yakuake session management
 --------------------------
 
