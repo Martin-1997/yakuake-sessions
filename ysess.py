@@ -173,7 +173,7 @@ def load_sessions(file):
         if opts['cmd']:
             for cmd in opts['cmd'].split(r'\n'):
                 # get_yakuake('/yakuake/sessions runCommand "%s"' % cmd)
-                dbus_session = bus.get_object('org.kde.yakuake', '/Sessions/{}'.format(i + 1))
+                dbus_session = bus.get_object('org.kde.yakuake', '/Sessions/{}'.format(i + 2))
                 dbus_session = dbus.Interface(dbus_session, 'org.kde.konsole.Session')
                 dbus_session.sendText(cmd)
                 dbus_session.sendText('\n')
@@ -196,7 +196,7 @@ if __name__ == '__main__':
     op.add_option('-o', '--out-file', dest='outfile', help='File to write to, or "-" for stdout', metavar='FILE')
     op.add_option('--force-overwrite', dest='force_overwrite', help='Do not prompt for confirmation if out-file exists', action="store_true", default=False)
     opts, args = op.parse_args()
-
+    
     if opts.outfile is None and opts.infile is None:
         format_sessions(get_sessions(sys.getdefaultencoding()), sys.stdout, sys.getdefaultencoding())
     elif opts.outfile:
