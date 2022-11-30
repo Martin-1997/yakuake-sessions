@@ -1,0 +1,22 @@
+[build-system]
+requires = ['hatchling', 'dbus-python']
+build-backend = "hatchling.build"
+
+[project]
+name = "yakuake-session-manager"
+version = "1.0.0"
+authors = [
+  { name="Martin Zeitler", email="zeitler.martin@protonmail.ch" },
+]
+description = "Session manager for Yakuake. Allows storing sessions to a file and recreating them from a file."
+readme = "README.rst"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Martin-1997/yakuake-sessions"
+"Bug Tracker" = "https://github.com/Martin-1997/yakuake-sessions/issues"
