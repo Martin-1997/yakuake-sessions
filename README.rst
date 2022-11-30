@@ -1,9 +1,11 @@
 Yakuake session management
 --------------------------
 
+Updated in November 2022 to work with newer Python and Yakuake version!
+
 Requires: yakuake, qdbus (libqt4-dbus), pwdx (procps), ps (procps)
 
-Tested on: Ubuntu Maverick (10.10) with Python 2.6 and Yakuake 2.9.7
+Tested on: Fedora 36 with Python 3.10.8 and Yakuake 22.08.1
 
 Does not support old versions of yakuake that use DCOP instead of DBUS.
 

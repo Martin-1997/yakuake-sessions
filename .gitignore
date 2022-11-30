@@ -91,5 +91,5 @@ ENV/
 # Created by .ignore support plugin (hsz.mobi)
 .idea
 
-# Testing file
-test.txt
+# File which stores the current Yakuake state
+yakuake_state.txt
