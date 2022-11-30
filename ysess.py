@@ -141,7 +141,7 @@ def load_sessions(file):
     # This starts the command and idels until the program (yakuake) is ended - this leads to the problem that the whole calling code is also on hold
     # subprocess.call(['yakuake'])
     subprocess.Popen(['yakuake'])
-    time.sleep(2)
+    time.sleep(1)
     # for section in sections:
     #     get_yakuake('/yakuake/sessions addSession')
     # import time
